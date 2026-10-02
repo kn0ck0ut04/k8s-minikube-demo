@@ -1,0 +1,44 @@
+{
+  "id": null,
+  "uid": "my-app-minikube",
+  "title": "my-app / Minikube",
+  "tags": ["minikube", "kubernetes", "my-app"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "10s",
+  "time": {"from": "now-15m", "to": "now"},
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "CPU usage per pod (cores)",
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [{"expr": "sum by (pod) (rate(container_cpu_usage_seconds_total{namespace=\"default\",pod=~\"my-app-.*\",container!=\"POD\",container!=\"\"}[5m]))", "legendFormat": "{{pod}}", "refId": "A"}],
+      "fieldConfig": {"defaults": {"unit": "cores", "min": 0}, "overrides": []},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0}
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "Memory usage per pod",
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [{"expr": "sum by (pod) (container_memory_working_set_bytes{namespace=\"default\",pod=~\"my-app-.*\",container!=\"POD\",container!=\"\"})", "legendFormat": "{{pod}}", "refId": "A"}],
+      "fieldConfig": {"defaults": {"unit": "bytes", "min": 0}, "overrides": []},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0}
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "my-app replicas",
+      "datasource": {"type": "prometheus", "uid": "prometheus"},
+      "targets": [
+        {"expr": "kube_deployment_spec_replicas{namespace=\"default\",deployment=\"my-app\"}", "legendFormat": "desired", "refId": "A"},
+        {"expr": "kube_deployment_status_replicas_available{namespace=\"default\",deployment=\"my-app\"}", "legendFormat": "available", "refId": "B"},
+        {"expr": "kube_horizontalpodautoscaler_status_current_replicas{namespace=\"default\",horizontalpodautoscaler=\"my-app\"}", "legendFormat": "HPA current", "refId": "C"}
+      ],
+      "fieldConfig": {"defaults": {"unit": "short", "min": 0}, "overrides": []},
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 8}
+    }
+  ]
+}
